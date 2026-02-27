@@ -25,6 +25,9 @@ public class SimpleClansExpansion extends PlaceholderExpansion implements Relati
 
     private static final Pattern TOP_CLANS_PATTERN = Pattern.compile("(?<strip>^topclans_(?<position>\\d+)_)clan_");
     private static final Pattern TOP_PLAYERS_PATTERN = Pattern.compile("(?<strip>^topplayers_(?<position>\\d+)_)");
+    private static final Pattern TOP_CLANS_KILLS_PATTERN = Pattern.compile("(?<strip>^topclans_kills_(?<position>\\d+)_)clan_");
+    private static final Pattern TOP_PLAYERS_KILLS_PATTERN = Pattern.compile("(?<strip>^topplayers_kills_(?<position>\\d+)_)");
+    private static final Pattern TOP_CLANS_BALANCE_PATTERN = Pattern.compile("(?<strip>^topclans_balance_(?<position>\\d+)_)clan_");
     private static final Map<String, PlaceholderResolver> RESOLVERS = new HashMap<>();
     private List<String> placeholders;
     private final SimpleClans plugin;
@@ -117,25 +120,61 @@ public class SimpleClansExpansion extends PlaceholderExpansion implements Relati
     @Override
     public String onRequest(@Nullable OfflinePlayer player, @NotNull String params) {
         ClanPlayer cp = null;
+        Clan clan = null;
+        
+        // Проверяем, это запрос топов кланов по KDR
+        Matcher matcher = TOP_CLANS_PATTERN.matcher(params);
+        if (matcher.find()) {
+            int position = Integer.parseInt(matcher.group("position"));
+            clan = getFromPosition(clanManager.getClans(), position, clanManager::sortClansByKDR);
+            params = params.replace(matcher.group("strip"), "");
+            return getValue(player, cp, clan, params);
+        }
+        
+        // Проверяем, это запрос топов кланов по убийствам
+        matcher = TOP_CLANS_KILLS_PATTERN.matcher(params);
+        if (matcher.find()) {
+            int position = Integer.parseInt(matcher.group("position"));
+            clan = getFromPosition(clanManager.getClans(), position, clanManager::sortClansByKills);
+            params = params.replace(matcher.group("strip"), "");
+            return getValue(player, cp, clan, params);
+        }
+        
+        // Проверяем, это запрос топов кланов по балансу
+        matcher = TOP_CLANS_BALANCE_PATTERN.matcher(params);
+        if (matcher.find()) {
+            int position = Integer.parseInt(matcher.group("position"));
+            clan = getFromPosition(clanManager.getClans(), position, clanManager::sortClansByBalance);
+            params = params.replace(matcher.group("strip"), "");
+            return getValue(player, cp, clan, params);
+        }
+        
+        // Проверяем, это запрос топов игроков по KDR
+        matcher = TOP_PLAYERS_PATTERN.matcher(params);
+        if (matcher.find()) {
+            int position = Integer.parseInt(matcher.group("position"));
+            cp = getFromPosition(clanManager.getAllClanPlayers(), position, clanManager::sortClanPlayersByKDR);
+            params = params.replace(matcher.group("strip"), "");
+            return getValue(player, cp, clan, params);
+        }
+        
+        // Проверяем, это запрос топов игроков по убийствам
+        matcher = TOP_PLAYERS_KILLS_PATTERN.matcher(params);
+        if (matcher.find()) {
+            int position = Integer.parseInt(matcher.group("position"));
+            cp = getFromPosition(clanManager.getAllClanPlayers(), position, clanManager::sortClanPlayersByKills);
+            params = params.replace(matcher.group("strip"), "");
+            return getValue(player, cp, clan, params);
+        }
+        
+        // Обычные плейсхолдеры требуют игрока
         if (player != null) {
             cp = clanManager.getAnyClanPlayer(player.getUniqueId());
         }
         if (cp == null) {
             return "";
         }
-        Clan clan = cp.getClan();
-        Matcher matcher = TOP_CLANS_PATTERN.matcher(params);
-        if (matcher.find()) {
-            int position = Integer.parseInt(matcher.group("position"));
-            clan = getFromPosition(clanManager.getClans(), position, clanManager::sortClansByKDR);
-            params = params.replace(matcher.group("strip"), "");
-        }
-        matcher = TOP_PLAYERS_PATTERN.matcher(params);
-        if (matcher.find()) {
-            int position = Integer.parseInt(matcher.group("position"));
-            cp = getFromPosition(clanManager.getAllClanPlayers(), position, clanManager::sortClanPlayersByKDR);
-            params = params.replace(matcher.group("strip"), "");
-        }
+        clan = cp.getClan();
         return getValue(player, cp, clan, params);
     }
 

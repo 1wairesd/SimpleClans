@@ -27,13 +27,29 @@ public class RankingPositionResolver extends PlaceholderResolver {
                                    @NotNull String placeholder, @NotNull Map<String, String> config) {
         if (object instanceof Clan) {
             List<Clan> clans = plugin.getClanManager().getClans();
-            plugin.getClanManager().sortClansByKDR(clans);
+            
+            // Определяем тип сортировки по имени плейсхолдера
+            if (placeholder.contains("kills")) {
+                plugin.getClanManager().sortClansByKills(clans);
+            } else if (placeholder.contains("balance")) {
+                plugin.getClanManager().sortClansByBalance(clans);
+            } else {
+                // По умолчанию сортируем по KDR
+                plugin.getClanManager().sortClansByKDR(clans);
+            }
 
             return String.valueOf(clans.indexOf(object) + 1);
         }
         if (object instanceof ClanPlayer) {
             List<ClanPlayer> clanPlayers = plugin.getClanManager().getAllClanPlayers();
-            plugin.getClanManager().sortClanPlayersByKDR(clanPlayers);
+            
+            // Определяем тип сортировки по имени плейсхолдера
+            if (placeholder.contains("kills")) {
+                plugin.getClanManager().sortClanPlayersByKills(clanPlayers);
+            } else {
+                // По умолчанию сортируем по KDR
+                plugin.getClanManager().sortClanPlayersByKDR(clanPlayers);
+            }
 
             return String.valueOf(clanPlayers.indexOf(object) + 1);
         }

@@ -897,6 +897,42 @@ public final class ClanManager {
     }
 
     /**
+     * Sort clans by total kills
+     */
+    public void sortClansByKills(List<Clan> clans) {
+        clans.sort((c1, c2) -> {
+            Integer o1 = c1.getTotalKills();
+            Integer o2 = c2.getTotalKills();
+
+            return o2.compareTo(o1);
+        });
+    }
+
+    /**
+     * Sort clans by balance
+     */
+    public void sortClansByBalance(List<Clan> clans) {
+        clans.sort((c1, c2) -> {
+            Double o1 = c1.getBalance();
+            Double o2 = c2.getBalance();
+
+            return o2.compareTo(o1);
+        });
+    }
+
+    /**
+     * Sort clan players by total kills
+     */
+    public void sortClanPlayersByKills(List<ClanPlayer> cps) {
+        cps.sort((c1, c2) -> {
+            Integer o1 = c1.getTotalKills();
+            Integer o2 = c2.getTotalKills();
+
+            return o2.compareTo(o1);
+        });
+    }
+
+    /**
      * Sort clan players by last seen days
      */
     public void sortClanPlayersByLastSeen(List<ClanPlayer> cps) {

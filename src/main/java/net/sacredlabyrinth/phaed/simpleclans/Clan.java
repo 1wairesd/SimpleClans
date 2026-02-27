@@ -244,6 +244,7 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return the balance
      */
     @Placeholder("balance")
+    @Placeholder(value = "topclans_balance_position", resolver = "ranking_position")
     public double getBalance() {
         return balance;
     }
@@ -918,6 +919,7 @@ public class Clan implements Serializable, Comparable<Clan> {
     }
 
     @Placeholder("total_kills")
+    @Placeholder(value = "topclans_kills_position", resolver = "ranking_position")
     public int getTotalKills() {
         return getTotalCivilian() + getTotalNeutral() + getTotalRival() + getTotalAlly();
     }
