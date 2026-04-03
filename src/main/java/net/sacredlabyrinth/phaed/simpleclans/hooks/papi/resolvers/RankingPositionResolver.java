@@ -38,7 +38,8 @@ public class RankingPositionResolver extends PlaceholderResolver {
                 plugin.getClanManager().sortClansByKDR(clans);
             }
 
-            return String.valueOf(clans.indexOf(object) + 1);
+            int position = clans.indexOf(object) + 1;
+            return position > 0 ? position + "." : "";
         }
         if (object instanceof ClanPlayer) {
             List<ClanPlayer> clanPlayers = plugin.getClanManager().getAllClanPlayers();
@@ -51,7 +52,8 @@ public class RankingPositionResolver extends PlaceholderResolver {
                 plugin.getClanManager().sortClanPlayersByKDR(clanPlayers);
             }
 
-            return String.valueOf(clanPlayers.indexOf(object) + 1);
+            int position = clanPlayers.indexOf(object) + 1;
+            return position > 0 ? position + "." : "";
         }
 
         return "";

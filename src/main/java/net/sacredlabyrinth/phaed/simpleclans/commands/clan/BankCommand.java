@@ -47,11 +47,22 @@ public class BankCommand extends BaseCommand {
     @CommandPermission("simpleclans.member.bank")
     @Conditions("rank:name=BANK_WITHDRAW")
     @Description("{@@command.description.bank.withdraw.amount}")
-    public void bankWithdraw(Player player, Clan clan, double amount) {
+    public void bankWithdraw(Player player, Clan clan, String amountStr) {
+        double amount;
+        try {
+            amount = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            player.sendMessage(RED + lang("invalid.amount", player));
+            return;
+        }
         processWithdraw(player, clan, amount);
     }
 
     private void processWithdraw(Player player, Clan clan, double amount) {
+        if (amount <= 0) {
+            player.sendMessage(RED + lang("invalid.amount", player));
+            return;
+        }
         if (!clan.isAllowWithdraw()) {
             String message = getCurrentCommandManager().getCommandReplacements()
                     .replace(lang("withdraw.not.allowed", player));
@@ -79,6 +90,7 @@ public class BankCommand extends BaseCommand {
                 } else {
                     clan.setBalance(operator, REVERT, BankLogger.Operation.WITHDRAW, clan.getBalance() + amount);
                 }
+                break;
             case NOT_ENOUGH_BALANCE:
                 player.sendMessage(lang("clan.bank.not.enough.money", player));
         }
@@ -96,11 +108,22 @@ public class BankCommand extends BaseCommand {
     @CommandPermission("simpleclans.member.bank")
     @Conditions("rank:name=BANK_DEPOSIT")
     @Description("{@@command.description.bank.deposit.amount}")
-    public void bankDeposit(Player player, Clan clan, double amount) {
+    public void bankDeposit(Player player, Clan clan, String amountStr) {
+        double amount;
+        try {
+            amount = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            player.sendMessage(RED + lang("invalid.amount", player));
+            return;
+        }
         processDeposit(player, clan, amount);
     }
 
     private void processDeposit(Player player, Clan clan, double amount) {
+        if (amount <= 0) {
+            player.sendMessage(RED + lang("invalid.amount", player));
+            return;
+        }
         if (!clan.isAllowDeposit()) {
             String message = getCurrentCommandManager().getCommandReplacements()
                     .replace(lang("deposit.not.allowed", player));
@@ -112,6 +135,7 @@ public class BankCommand extends BaseCommand {
         /*
             TODO: Remove at SimpleClans 3.0
          */
+        @SuppressWarnings("deprecation")
         BankDepositEvent event = new BankDepositEvent(player, clan, amount);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {

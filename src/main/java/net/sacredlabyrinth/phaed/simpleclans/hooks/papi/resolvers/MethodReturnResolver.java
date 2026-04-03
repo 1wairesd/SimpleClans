@@ -8,10 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.util.Map;
 
 @SuppressWarnings("unused")
 public class MethodReturnResolver extends PlaceholderResolver {
+    
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.##");
 
     public MethodReturnResolver(@NotNull SimpleClans plugin) {
         super(plugin);
@@ -31,6 +34,10 @@ public class MethodReturnResolver extends PlaceholderResolver {
         }
         if (result instanceof Boolean) {
             return ((Boolean) result) ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+        }
+        // Форматируем double значения правильно (без научной нотации)
+        if (result instanceof Double || result instanceof Float) {
+            return DECIMAL_FORMAT.format(((Number) result).doubleValue());
         }
         return String.valueOf(result);
     }
